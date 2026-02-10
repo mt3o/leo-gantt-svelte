@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { LineCoords } from '$lib/logic/dependency-math';
 
-  let { lines } = $props<{ lines: LineCoords[] }>();
+  let { lines, highlighted = false } = $props<{ lines: LineCoords[], highlighted?: boolean }>();
 </script>
 
 <g class="dependency-lines">
@@ -12,15 +12,15 @@
         y1={line.y1}
         x2={line.x2}
         y2={line.y2}
-        class="stroke-slate-400 stroke-[1.5] opacity-60"
+        class={highlighted ? "stroke-blue-500 stroke-[2] opacity-100" : "stroke-slate-400 stroke-[1.5] opacity-60"}
         stroke-linecap="round"
       />
 
       <circle
         cx={line.x2}
         cy={line.y2}
-        r="2"
-        class="fill-slate-400"
+        r={highlighted ? "3" : "2"}
+        class={highlighted ? "fill-blue-500" : "fill-slate-400"}
       />
     </g>
   {/each}

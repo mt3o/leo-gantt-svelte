@@ -24,6 +24,7 @@
   let scrollTop = $state(0);
   let expandedIds = $state(new Set<string>([rawResources[0].id])); // Start with first group open
   let containerWidth = $state(1200);
+  let selectedTaskId = $state<string | null>(null);
 
   // 3. Derived Logic
   // This automatically re-flattens whenever expandedIds changes
@@ -74,6 +75,15 @@
     }
   }
 
+  function handleTaskClick(id: string) {
+    if (selectedTaskId === id) {
+      selectedTaskId = null;
+    } else {
+      selectedTaskId = id;
+    }
+    console.log('Task clicked:', id);
+  }
+
 </script>
 
 <main class="h-screen w-screen flex flex-col bg-slate-100 overflow-hidden">
@@ -103,6 +113,7 @@
       {viewStart}
       {viewEnd}
       {scrollTop}
+      {selectedTaskId}
 
       containerWidth={containerWidth}
       containerHeight={800}
@@ -113,7 +124,7 @@
 
       onScroll={(top) => scrollTop = top}
       onRowToggle={toggleRow}
-      onTaskClick={(id) => console.log('Task clicked:', id)}
+      onTaskClick={handleTaskClick}
     />
   </div>
 </main>

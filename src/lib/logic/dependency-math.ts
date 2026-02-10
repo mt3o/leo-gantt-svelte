@@ -3,6 +3,8 @@ import { timeToPixel } from './viewport';
 
 export interface LineCoords {
   id: string;
+  from: string;
+  to: string;
   x1: number;
   y1: number;
   x2: number;
@@ -41,6 +43,8 @@ export function calculateDependencyLines(
 
         lines.push({
           id: `${dep.from}-${dep.to}`,
+          from: dep.from,
+          to: dep.to,
           x1: timeToPixel(fromTask.end, viewportConfig),
           y1: fromY + verticalOffset,
           x2: timeToPixel(toTask.start, viewportConfig),

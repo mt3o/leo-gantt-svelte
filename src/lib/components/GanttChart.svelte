@@ -9,6 +9,7 @@
   import {calculateDependencyLines} from "../logic/dependency-math";
   import {timeToPixel} from "$lib/logic/viewport";
   import {getVisibleElements} from "$lib/logic/virtualizer";
+  import { generateTicks } from '$lib/logic/ticks';
 
   interface Props {
     tasks: Task[];
@@ -19,6 +20,9 @@
     viewStart: Date;
     viewEnd: Date;
     scrollTop: number;
+
+    // Selection
+    selectedTaskId?: string | null;
 
     // Config
     containerHeight: number;
@@ -40,6 +44,7 @@
     viewStart,
     viewEnd,
     scrollTop,
+    selectedTaskId = null,
     containerHeight,
     containerWidth,
     rowHeight = 40,
@@ -75,7 +80,7 @@
     return map;
   });
 
-  const lines = $derived(
+  const allLines = $derived(
     calculateDependencyLines(
       dependencies,
       tasks,
@@ -86,18 +91,25 @@
     )
   );
 
-  const gridTicks = $derived.by(() => {
-    const { viewStart, viewEnd } = viewportConfig;
-    const ticks: number[] = [];
-    const curr = new Date(viewStart);
-    curr.setHours(0, 0, 0, 0);
-
-    while (curr < viewEnd) {
-      ticks.push(timeToPixel(curr, viewportConfig));
-      curr.setDate(curr.getDate() + 1);
+  const { normalLines, highlightedLines } = $derived.by(() => {
+    if (!selectedTaskId) {
+      return { normalLines: allLines, highlightedLines: [] };
     }
-    return ticks;
+
+    const normal = [];
+    const highlighted = [];
+
+    for (const line of allLines) {
+      if (line.from === selectedTaskId || line.to === selectedTaskId) {
+        highlighted.push(line);
+      } else {
+        normal.push(line);
+      }
+    }
+    return { normalLines: normal, highlightedLines: highlighted };
   });
+
+  const gridTicks = $derived(generateTicks(viewportConfig));
 
   function handleScroll(e: Event) {
     const target = e.currentTarget as HTMLElement;
@@ -135,8 +147,15 @@
       >
         <g class="grid-lines">
           <!-- Vertical Grid Lines -->
-          {#each gridTicks as x}
-            <line x1={x} y1="0" x2={x} y2="100%" class="stroke-slate-200" stroke-dasharray="4 2" />
+          {#each gridTicks as tick}
+            <line
+              x1={tick.x}
+              y1="0"
+              x2={tick.x}
+              y2="100%"
+              class={tick.isMajor ? "stroke-slate-300" : "stroke-slate-200"}
+              stroke-dasharray={tick.isMajor ? "" : "4 2"}
+            />
           {/each}
 
           <!-- Horizontal Grid Lines -->
@@ -146,7 +165,8 @@
           {/each}
         </g>
 
-        <DependencyLines {lines} />
+        <!-- Normal Lines (Below Tasks) -->
+        <DependencyLines lines={normalLines} />
 
         <g class="tasks-layer pointer-events-auto">
           {#each virtualData.visibleTasks as task (task.id)}
@@ -167,6 +187,9 @@
             {/if}
           {/each}
         </g>
+
+        <!-- Highlighted Lines (Above Tasks) -->
+        <DependencyLines lines={highlightedLines} highlighted={true} />
       </svg>
     </div>
   </div>

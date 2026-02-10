@@ -1,36 +1,28 @@
 <script lang="ts">
-
-
-
-  import {timeToPixel} from "$lib/logic/viewport";
-  import type {ViewportConfig} from "$lib";
+  import type { ViewportConfig } from '$lib/types/gantt';
+  import { generateTicks } from '$lib/logic/ticks';
 
   let { config } = $props<{ config: ViewportConfig }>();
 
-  // Logic to generate ticks based on zoom level
-  const ticks = $derived.by(() => {
-    const { viewStart, viewEnd } = config;
-    const items: { label: string; x: number }[] = [];
-    const curr = new Date(viewStart);
-    curr.setHours(0, 0, 0, 0);
-
-    // Basic implementation: one tick per day
-    while (curr < viewEnd) {
-      items.push({
-        label: curr.toLocaleDateString('en-US', { day: 'numeric', month: 'short' }),
-        x: timeToPixel(curr, config)
-      });
-      curr.setDate(curr.getDate() + 1);
-    }
-    return items;
-  });
+  const ticks = $derived(generateTicks(config));
 </script>
 
 <div class="h-10 border-b border-slate-200 bg-slate-50 relative overflow-hidden">
   <svg width={config.containerWidth} height="40">
     {#each ticks as tick}
-      <line x1={tick.x} y1="25" x2={tick.x} y2="40" class="stroke-slate-300" />
-      <text x={tick.x + 4} y="20" class="fill-slate-500 text-[10px] font-medium">
+      <line
+        x1={tick.x}
+        y1={tick.isMajor ? 15 : 25}
+        x2={tick.x}
+        y2="40"
+        class={tick.isMajor ? "stroke-slate-400" : "stroke-slate-300"}
+      />
+      <text
+        x={tick.x + 4}
+        y={tick.isMajor ? 12 : 20}
+        class="fill-slate-500 text-[10px] font-medium"
+        class:font-bold={tick.isMajor}
+      >
         {tick.label}
       </text>
     {/each}
