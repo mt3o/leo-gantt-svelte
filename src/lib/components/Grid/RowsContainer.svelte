@@ -18,20 +18,18 @@
     onRowToggle?: (id: string) => void;
   }>();
 
-  // Padding to position visible elements correctly within the virtual list
-  const paddingTop = $derived(startIndex * rowHeight);
   const totalHeight = $derived(totalCount * rowHeight);
 </script>
 
 <div
   class="relative border-r border-slate-200 bg-white overflow-hidden flex-shrink-0"
   style:width="{width}px"
+  style:height="{totalHeight}px"
 >
-  <div style:height="{totalHeight}px" class="relative">
-    <div style:transform="translateY({paddingTop}px)">
-      {#each visibleRows as row (row.id)}
-        <Row {row} height={rowHeight} onToggle={onRowToggle} />
-      {/each}
+  {#each visibleRows as row, i (row.id)}
+    {@const y = (startIndex + i) * rowHeight}
+    <div class="absolute top-0 left-0 w-full" style:transform="translateY({y}px)">
+      <Row {row} height={rowHeight} onToggle={onRowToggle} />
     </div>
-  </div>
+  {/each}
 </div>

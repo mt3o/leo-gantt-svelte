@@ -110,6 +110,7 @@
   });
 
   const gridTicks = $derived(generateTicks(viewportConfig));
+  const totalHeight = $derived(rows.length * rowHeight);
 
   function handleScroll(e: Event) {
     const target = e.currentTarget as HTMLElement;
@@ -139,11 +140,9 @@
     />
 
     <div class="relative flex-1 bg-slate-50 shadow-inner">
-      <div style:height="{rows.length * rowHeight}px" class="w-full"></div>
-
       <svg
-        class="absolute top-0 left-0 w-full h-full pointer-events-none"
-        style:transform="translateY(0)"
+        class="absolute top-0 left-0 w-full pointer-events-none"
+        style:height="{totalHeight}px"
       >
         <g class="grid-lines">
           <!-- Vertical Grid Lines -->
