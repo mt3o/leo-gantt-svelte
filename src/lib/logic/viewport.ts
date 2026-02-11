@@ -1,13 +1,13 @@
+import type { ViewportConfig } from '../types/gantt';
 import type {GanttTheme} from "$lib/gantt-theme";
 
-
-export interface ViewportConfig {
-  viewStart: Date;
-  viewEnd: Date;
-}
-
 /**
- * Maps a Date to a horizontal pixel coordinate.
+ * Maps a Date to a horizontal pixel coordinate within the Gantt chart.
+ *
+ * @param date The date to convert.
+ * @param config The viewport configuration containing start/end dates and container width.
+ * @param theme the theming object
+ * @returns The horizontal pixel coordinate relative to the container start.
  */
 export function timeToPixel(date: Date, config: ViewportConfig, theme: GanttTheme): number {
   const { viewStart, viewEnd } = config;
@@ -19,7 +19,13 @@ export function timeToPixel(date: Date, config: ViewportConfig, theme: GanttThem
 }
 
 /**
- * Maps a horizontal pixel coordinate to a Date (useful for zooming/seeking).
+ * Maps a horizontal pixel coordinate to a Date.
+ * Useful for handling click events or drag interactions on the timeline.
+ *
+ * @param px The horizontal pixel coordinate.
+ * @param config The viewport configuration.
+ * @param theme the theming object
+ * @returns The date corresponding to the pixel coordinate.
  */
 export function pixelToTime(px: number, config: ViewportConfig, theme: GanttTheme): Date {
   const containerWidth = theme.dimensions.containerWidth - theme.dimensions.sidebarWidth;
@@ -32,7 +38,12 @@ export function pixelToTime(px: number, config: ViewportConfig, theme: GanttThem
 
 /**
  * Calculates a new time range based on a zoom factor and a focal point (pixel).
- * factor > 1 zooms out, factor < 1 zooms in.
+ *
+ * @param anchorPx The pixel coordinate of the mouse/focal point.
+ * @param zoomFactor The zoom factor (e.g., 1.1 for zooming out, 0.9 for zooming in).
+ * @param config The current viewport configuration.
+ * @param theme the theming object
+ * @returns The new start and end dates for the viewport.
  */
 export function calculateZoom(
   anchorPx: number,

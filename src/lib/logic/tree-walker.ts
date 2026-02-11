@@ -2,7 +2,13 @@ import type { ResourceGroup, ResourceRow, FlattenedItem, RowId } from '../types/
 
 /**
  * Flattens a nested resource structure into a linear list for rendering.
- * Only children of expanded groups are marked as isVisible.
+ * Only children of expanded groups are included in the result.
+ * 
+ * @param resources The hierarchical list of resources (groups and rows).
+ * @param expandedIds A Set containing the IDs of expanded groups.
+ * @param level The current nesting level (used for recursion).
+ * @param parentId The ID of the parent group (used for recursion).
+ * @returns A flat array of items ready to be rendered in the virtual list.
  */
 export function flattenResources(
   resources: (ResourceGroup | ResourceRow)[],
@@ -38,14 +44,25 @@ export function flattenResources(
   return result;
 }
 
+/**
+ * Represents the projection of a task from a hidden row to a visible ancestor.
+ */
 export interface Projection {
+  /** The ID of the visible ancestor row */
   targetId: RowId;
+  /** The label of the visible ancestor row */
   label: string;
 }
 
 /**
  * Builds a map of RowId -> Visible Ancestor Info.
  * Used to project tasks from hidden rows onto their collapsed group headers.
+ * 
+ * @param resources The hierarchical list of resources.
+ * @param expandedIds A Set containing the IDs of expanded groups.
+ * @param map The map being built (used for recursion).
+ * @param ancestor The current visible ancestor (used for recursion).
+ * @returns A Map where keys are hidden row IDs and values are Projection objects.
  */
 export function getTaskProjectionMap(
   resources: (ResourceGroup | ResourceRow)[],

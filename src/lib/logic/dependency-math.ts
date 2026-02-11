@@ -2,19 +2,36 @@ import type { Dependency, Task, ViewportConfig } from '../types/gantt';
 import { timeToPixel } from './viewport';
 import type {GanttTheme} from "$lib/gantt-theme";
 
+/**
+ * Represents the coordinates for a dependency line.
+ */
 export interface LineCoords {
+  /** Unique identifier for the line (e.g., "task1-task2") */
   id: string;
+  /** ID of the source task */
   from: string;
+  /** ID of the target task */
   to: string;
+  /** Starting X coordinate */
   x1: number;
+  /** Starting Y coordinate */
   y1: number;
+  /** Ending X coordinate */
   x2: number;
+  /** Ending Y coordinate */
   y2: number;
 }
 
 /**
- * Calculates straight line coordinates between tasks.
- * rowIndexMap is a Map of rowId -> rowIndex (global)
+ * Calculates straight line coordinates between tasks based on dependencies.
+ *
+ * @param dependencies List of dependencies to render.
+ * @param tasks List of all tasks (used to find positions).
+ * @param rowIndexMap Map of rowId to its vertical index (0-based).
+ * @param viewportConfig Viewport configuration for time-to-pixel conversion.
+ * @param rowHeight Height of a single row in pixels.
+ * @param taskHeight Height of a task bar in pixels.
+ * @returns Array of line coordinates ready for rendering.
  */
 export function calculateDependencyLines(
   dependencies: Dependency[],

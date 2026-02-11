@@ -2,11 +2,18 @@ import type { ViewportConfig } from '../types/gantt';
 import { timeToPixel } from './viewport';
 import type {GanttTheme} from "$lib/gantt-theme";
 
+/**
+ * Represents a tick mark on the timeline.
+ */
 export interface Tick {
+  /** The date/time of the tick */
   date: Date;
+  /** The horizontal pixel position of the tick */
   x: number;
+  /** The label to display for the tick */
   label: string;
-  isMajor: boolean; // e.g. start of day, week, or month
+  /** Whether this is a major tick (e.g., start of day/week/month) */
+  isMajor: boolean;
 }
 
 const MIN_TICK_WIDTH_PX = 70; // Minimum space for a label
@@ -33,6 +40,12 @@ function getWeekNumber(d: Date): number {
     return weekNo;
 }
 
+/**
+ * Generates adaptive ticks for the timeline header based on the current zoom level.
+ *
+ * @param config The viewport configuration.
+ * @returns An array of Tick objects.
+ */
 export function generateTicks(config: ViewportConfig, theme: GanttTheme): Tick[] {
   const { viewStart, viewEnd } = config;
   const durationMs = viewEnd.getTime() - viewStart.getTime();
