@@ -33,8 +33,16 @@
 		},
         "rootDirs": [
 			"./types"
-		],
-      	"include": [
+		]
+    }
+	// Path aliases are handled by https://svelte.dev/docs/kit/configuration#alias
+	// except $lib which is handled by https://svelte.dev/docs/kit/configuration#files
+	//
+	// To make changes to top-level options such as include and exclude, we recommend extending
+	// the generated config; see https://svelte.dev/docs/kit/configuration#typescript
+
+  ,
+      "include": [
 		"ambient.d.ts",
 		"non-ambient.d.ts",
 		"./types/**/$types.d.ts",
@@ -56,10 +64,4 @@
 		"src/service-worker.d.ts",
 		"src/service-worker/**/*.d.ts"
 	]
-    }
-	// Path aliases are handled by https://svelte.dev/docs/kit/configuration#alias
-	// except $lib which is handled by https://svelte.dev/docs/kit/configuration#files
-	//
-	// To make changes to top-level options such as include and exclude, we recommend extending
-	// the generated config; see https://svelte.dev/docs/kit/configuration#typescript
 }

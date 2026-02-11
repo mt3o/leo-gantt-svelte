@@ -11,10 +11,9 @@
       highlighted?: boolean,
       theme?: Partial<GanttTheme>
   }>();
-  const _theme = {
-      ...GANTT_THEME,
-      ...theme
-  }
+
+  const _theme = $derived({...GANTT_THEME, ...theme});
+
 </script>
 
 <g class="dependency-lines">

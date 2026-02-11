@@ -2,7 +2,7 @@
   import GanttChart from '$lib/components/GanttChart.svelte';
   import Navigator from '$lib/components/Timeline/Navigator.svelte';
   import { GANTT_THEME } from '$lib/gantt-theme';
-  import type { GanttTask, GanttRow, ResourceGroup, ResourceRow } from '$lib/types/gantt';
+  import type {FlattenedItem, ResourceGroup, ResourceRow, Task} from '$lib/types/gantt';
   import { flattenResources } from '$lib/logic/tree-walker';
   import { handleWheelZoom } from '$lib/logic/navigation';
 
@@ -24,7 +24,7 @@
   ];
 
   // Flatten all rows to get all row IDs for task generation
-  const allRowsFlat: GanttRow[] = flattenResources(rawResources, new Set(rawResources.filter(r => r.type === 'group').map(r => r.id))); // Expand all for initial flattening
+  const allRowsFlat: FlattenedItem[] = flattenResources(rawResources, new Set(rawResources.filter(r => r.type === 'group').map(r => r.id))); // Expand all for initial flattening
   const allRowIds = allRowsFlat.map(r => r.id);
 
   // Generate heatmap values and colors
@@ -39,7 +39,7 @@
     return `rgb(${y}, ${g}, 0)`;
   }
 
-  const heatmapTasks: GanttTask[] = [];
+  const heatmapTasks: Task[] = [];
   const intervalMs = 60 * 60 * 1000; // 1 hour intervals
 
   for (const rowId of allRowIds) {
@@ -67,7 +67,6 @@
   let viewEnd = $state(new Date('2026-01-01T18:00:00'));
   let scrollTop = $state(0);
   let expandedIds = $state(new Set<string>(rawResources.filter(r => r.type === 'group').map(r => r.id))); // Expand all groups initially
-  let containerWidth = $state(1200);
 
   // --- Derived Logic ---
   const flattenedRows = $derived(flattenResources(rawResources, expandedIds));

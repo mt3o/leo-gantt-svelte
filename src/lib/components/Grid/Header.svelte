@@ -11,10 +11,7 @@
       theme: Partial<GanttTheme>
   }>();
 
-  const _theme = {
-      ...GANTT_THEME,
-      ...theme,
-  }
+  const _theme = $derived({...GANTT_THEME, ...theme});
   const ticks = $derived(generateTicks(viewportConfig, _theme));
 </script>
 

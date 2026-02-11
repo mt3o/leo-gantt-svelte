@@ -23,7 +23,7 @@
         onRangeChange
     }: Props = $props();
 
-    const _theme = {...GANTT_THEME, ...theme};
+    const _theme = $derived({...GANTT_THEME, ...theme})
 
 
 
@@ -169,7 +169,7 @@
 
         <!-- Right Handle -->
         <div
-                class="RIGHT_HANDLE absolute top-0 right-0 h-full w-3 -mr-1.5 cursor-ew-resize flex items-center justify-center hover:bg-blue-500/20"
+                class="absolute top-0 right-0 h-full w-3 -mr-1.5 cursor-ew-resize flex items-center justify-center hover:bg-blue-500/20"
                 onmousedown={(e) => handleResizeStart(e, 'right')}
         >
             <div class={`${_theme.colors.navigatorHandle} w-[2px] h-4 rounded-full`}

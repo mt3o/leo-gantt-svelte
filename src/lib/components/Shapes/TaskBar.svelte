@@ -17,10 +17,9 @@
     onclick?: (id: string) => void;
     theme: Partial<GanttTheme>;
   }>();
-const _theme = {
-    ...GANTT_THEME,
-    ...theme,
-}
+
+    const _theme = $derived({...GANTT_THEME, ...theme});
+
 </script>
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->

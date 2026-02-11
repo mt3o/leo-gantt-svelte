@@ -48,14 +48,11 @@
     onScroll
   }:Props = $props();
 
-  const _theme: GanttTheme = {
-      ...GANTT_THEME,
-      ...theme,
-  }
+  const _theme = $derived({...GANTT_THEME, ...theme});
 
-  const rowHeight = _theme.dimensions.rowHeight;
-  const taskHeight = _theme.dimensions.taskHeight;
-  const sidebarWidth = _theme.dimensions.sidebarWidth;
+  const rowHeight = $derived(_theme.dimensions.rowHeight);
+  const taskHeight = $derived(_theme.dimensions.taskHeight);
+  const sidebarWidth = $derived(_theme.dimensions.sidebarWidth);
 
   // --- Logic ---
 

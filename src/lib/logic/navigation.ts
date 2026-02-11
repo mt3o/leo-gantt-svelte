@@ -26,7 +26,7 @@ export function handleWheelZoom(
   // Sensitivity: adjust the 0.001 to speed up/slow down zoom
   const zoomFactor = 1 + event.deltaY * 0.001;
 
-  const newRange = calculateZoom(offsetX, zoomFactor, config);
+  const newRange = calculateZoom(offsetX, zoomFactor, config, theme);
   const newDuration = newRange.end.getTime() - newRange.start.getTime();
 
   // Constrain zoom levels
@@ -42,13 +42,14 @@ export function handleWheelZoom(
  */
 export function handlePan(
   deltaX: number,
-  config: ViewportConfig
+  config: ViewportConfig,
+  theme: GanttTheme
 ): { start: Date; end: Date } {
-  const { viewStart, viewEnd, containerWidth } = config;
+  const { viewStart, viewEnd } = config;
   const totalMs = viewEnd.getTime() - viewStart.getTime();
 
   // Calculate how much time 1 pixel represents
-  const msPerPixel = totalMs / containerWidth;
+  const msPerPixel = totalMs / theme.dimensions.containerWidth;
   const timeOffset = deltaX * msPerPixel;
 
   return {

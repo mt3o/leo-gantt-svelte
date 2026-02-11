@@ -23,10 +23,8 @@
 
   const totalHeight = $derived(totalCount * rowHeight);
 
-  const _theme = {
-      ...GANTT_THEME,
-      ...theme
-  }
+  const _theme = $derived({...GANTT_THEME, ...theme})
+
 </script>
 
 <div
@@ -38,7 +36,7 @@
     {@const y = (startIndex + i) * rowHeight}
     <div class="absolute top-0 left-0 w-full" style:transform="translateY({y}px)">
       <Row
-              theme={theme}
+              theme={_theme}
               {row}
               height={rowHeight}
               onToggle={onRowToggle} />
