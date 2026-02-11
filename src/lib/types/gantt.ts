@@ -17,8 +17,18 @@ export interface Task {
   rowId: RowId;
   start: Date;
   end: Date;
+
   label: string;
+    /**
+     * Color for task background, from tailwind
+     * If not present, `theme.color.taskDefault` will be used
+     */
   color?: string;
+    /**
+     * Class for text color styling, from tailwind.
+     * If not present, `theme.color.taskText` will be used
+     */
+  textColor?: string;
 }
 
 export interface ResourceRow {

@@ -44,7 +44,8 @@
       x={x + 6}
       y={y + height / 2}
       dominant-baseline="central"
-      class="{_theme.colors.taskText} text-[11px] font-semibold pointer-events-none select-none"
+      fill={task?.textColor}
+      class="{!task?.textColor && _theme.colors.taskText} text-[11px] font-semibold pointer-events-none select-none"
     >
       {task.label}
     </text>

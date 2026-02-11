@@ -15,6 +15,7 @@
   const ticks = $derived(generateTicks(viewportConfig, _theme));
 </script>
 
+
 <div
         class={`HEADER ${_theme.colors.background} h-10 border-b border-slate-200 relative overflow-hidden`}
         style={`width: 100%;`}
