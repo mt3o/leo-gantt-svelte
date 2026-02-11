@@ -12,6 +12,10 @@ export interface GanttTheme {
     navigatorText: string;
     rowHover: string;
     navigatorHandle: string;
+    border: string;
+    sidebarBackground: string;
+    text: string;
+    textLight: string;
   };
   styles: {
     taskRadius: string;
@@ -43,6 +47,10 @@ export const GANTT_THEME: GanttTheme = {
     navigatorText: 'text-slate-500',
     rowHover: 'hover:bg-slate-50',
     navigatorHandle: 'bg-blue-500',
+    border: '#e2e8f0', // slate-200
+    sidebarBackground: '#ffffff', // white
+    text: '#1e293b', // slate-800
+    textLight: '#64748b', // slate-500
   },
   styles: {
     taskRadius: '4px',
@@ -74,6 +82,10 @@ export const GANTT_THEME_DARK: GanttTheme = {
     navigatorText: 'text-slate-400',
     rowHover: 'hover:bg-slate-700',
     navigatorHandle: 'bg-blue-200',
+    border: '#334155', // slate-700
+    sidebarBackground: '#1e293b', // slate-800
+    text: '#f1f5f9', // slate-100
+    textLight: '#94a3b8', // slate-400
   },
   styles: {
     taskRadius: '4px',
