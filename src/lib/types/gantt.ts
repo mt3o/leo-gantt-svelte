@@ -9,8 +9,7 @@ export interface ViewportConfig {
   viewStart: Date;
   /** The end date of the currently visible time window */
   viewEnd: Date;
-  /** The width of the SVG/Canvas container in pixels */
-  containerWidth: number;
+
 }
 
 export interface Task {

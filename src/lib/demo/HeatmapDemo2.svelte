@@ -2,7 +2,7 @@
   import GanttChart from '$lib/components/GanttChart.svelte';
   import Navigator from '$lib/components/Timeline/Navigator.svelte';
   import { GANTT_THEME } from '$lib/gantt-theme';
-  import {type ResourceGroup, type ResourceRow, type Task} from '$lib/types/gantt';
+  import type { GanttTask, GanttRow, ResourceGroup, ResourceRow } from '$lib/types/gantt';
   import { flattenResources } from '$lib/logic/tree-walker';
   import { handleWheelZoom } from '$lib/logic/navigation';
 
@@ -23,25 +23,23 @@
     ]},
   ];
 
-  const _theme = {...GANTT_THEME};
-
   // Flatten all rows to get all row IDs for task generation
-  const allRowsFlat = flattenResources(rawResources, new Set(rawResources.filter(r => r.type === 'group').map(r => r.id))); // Expand all for initial flattening
+  const allRowsFlat: GanttRow[] = flattenResources(rawResources, new Set(rawResources.filter(r => r.type === 'group').map(r => r.id))); // Expand all for initial flattening
   const allRowIds = allRowsFlat.map(r => r.id);
 
   // Generate heatmap values and colors
   const minVal = 0;
-  const maxVal = 20;
+  const maxVal = 100;
 
   function getColorForValue(value: number): string {
     const ratio = (value - minVal) / (maxVal - minVal);
-    // Simple gradient from blue (low) to red (high)
-    const r = Math.floor(255 * ratio);
-    const b = Math.floor(255 * (1 - ratio));
-    return `rgb(${r}, 0, ${b})`;
+    // Gradient from green (low) to yellow (high)
+    const g = Math.floor(255 * ratio);
+    const y = Math.floor(255 * (1 - ratio));
+    return `rgb(${y}, ${g}, 0)`;
   }
 
-  const heatmapTasks: Task[] = [];
+  const heatmapTasks: GanttTask[] = [];
   const intervalMs = 60 * 60 * 1000; // 1 hour intervals
 
   for (const rowId of allRowIds) {
@@ -62,13 +60,14 @@
     }
   }
 
-  const tasks2 = heatmapTasks.filter((task:Task)=>parseInt(task.label)>3);
+  const _theme = {...GANTT_THEME};
 
   // --- Reactive State (Runes) ---
   let viewStart = $state(new Date('2026-01-01T08:00:00'));
   let viewEnd = $state(new Date('2026-01-01T18:00:00'));
   let scrollTop = $state(0);
   let expandedIds = $state(new Set<string>(rawResources.filter(r => r.type === 'group').map(r => r.id))); // Expand all groups initially
+  let containerWidth = $state(1200);
 
   // --- Derived Logic ---
   const flattenedRows = $derived(flattenResources(rawResources, expandedIds));
@@ -85,7 +84,7 @@
 
   function onWheel(e: WheelEvent) {
     const container = e.currentTarget as HTMLElement;
-    const config = { viewStart, viewEnd};
+    const config = { viewStart, viewEnd  };
     const nextRange = handleWheelZoom(e, container, config, _theme);
 
     if (nextRange) {
@@ -96,36 +95,31 @@
 </script>
 
 <main class=" w-screen flex flex-col bg-slate-100 overflow-hidden">
-    <h1>HeatmapDemo</h1>
 
-      <div
+  <div
     class="flex-1 p-4"
     onwheel={onWheel}
     role="none"
   >
-    <Navigator
+  <Navigator
     {totalStart}
     {totalEnd}
     {viewStart}
     {viewEnd}
-    theme={_theme}
+     theme={_theme}
     onRangeChange={(start, end) => {
       viewStart = start;
       viewEnd = end;
     }}
   />
-
     <GanttChart
-      tasks={tasks2}
+      tasks={heatmapTasks}
       rows={flattenedRows}
       dependencies={[]}
 
       {viewStart}
       {viewEnd}
       {scrollTop}
-
-      theme={_theme}
-
 
       onScroll={(top) => scrollTop = top}
       onRowToggle={toggleRow}

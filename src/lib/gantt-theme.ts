@@ -1,28 +1,115 @@
-export const GANTT_THEME = {
+export interface GanttTheme {
   colors: {
-    bgPrimary: 'bg-white',
-    bgSecondary: 'bg-slate-50',
-    border: 'border-slate-200',
-    gridLine: '#f1f5f9', // slate-100
-    textMuted: 'text-slate-500',
-    textPrimary: 'text-slate-700',
-    taskDefault: '#3b82f6', // blue-500
-    taskHover: '#2563eb',  // blue-600
-    dependencyLine: '#94a3b8', // slate-400
-    brushFocus: 'rgba(59, 130, 246, 0.1)', // blue-500 with opacity
-  },
+    background: string;
+    rowBackground: string;
+    taskDefault: string;
+    taskText: string;
+    gridLine: string;
+    dependencyLine: string;
+    dependencyLineHighlighted: string;
+    navigatorBackground: string;
+    navigatorBrush: string;
+    navigatorText: string;
+    rowHover: string;
+    navigatorHandle: string;
+  };
+  styles: {
+    taskRadius: string;
+  };
   dimensions: {
-    rowHeight: 40,
-    taskHeight: 26,
-    sidebarWidth: 260,
-    headerHeight: 40,
-    navigatorHeight: 50,
-    indentSize: 20,
+    sidebarWidth: number;
+    rowHeight: number;
+    taskHeight: number;
+    navigatorHeight: number;
+    containerWidth: number,
+    containerHeight: number;
+  };
+  classes: {
+    rowText: string;
+  }
+}
+
+export const GANTT_THEME: GanttTheme = {
+  colors: {
+    background: 'bg-white',
+    rowBackground: 'bg-white',
+    taskDefault: '#3b82f6', // blue-500
+    taskText: 'text-white',
+    gridLine: 'stroke-slate-100',
+    dependencyLine: 'stroke-slate-400 opacity-60',
+    dependencyLineHighlighted: 'stroke-blue-500 opacity-100',
+    navigatorBackground: 'bg-slate-100',
+    navigatorBrush: 'bg-blue-500/10',
+    navigatorText: 'text-slate-500',
+    rowHover: 'hover:bg-slate-50',
+    navigatorHandle: 'bg-blue-500',
   },
   styles: {
-    taskRadius: 4,
-    dependencyWidth: 1.5,
+    taskRadius: '4px',
+  },
+  dimensions: {
+    sidebarWidth: 250,
+    rowHeight: 40,
+    taskHeight: 24,
+    navigatorHeight: 40,
+    containerWidth: 1200,
+    containerHeight: 600,
+  },
+  classes: {
+    rowText: 'text-sm text-slate-700 truncate select-none',
   }
-} as const;
+};
 
-export type GanttTheme = typeof GANTT_THEME;
+export const GANTT_THEME_DARK: GanttTheme = {
+  colors: {
+    background: 'bg-slate-900',
+    rowBackground: 'bg-slate-800',
+    taskDefault: '#60a5fa', // blue-400
+    taskText: 'text-white',
+    gridLine: 'stroke-slate-700',
+    dependencyLine: 'stroke-slate-600 opacity-60',
+    dependencyLineHighlighted: 'stroke-blue-400 opacity-100',
+    navigatorBackground: 'bg-slate-800',
+    navigatorBrush: 'bg-blue-400/10',
+    navigatorText: 'text-slate-400',
+    rowHover: 'hover:bg-slate-700',
+    navigatorHandle: 'bg-blue-200',
+  },
+  styles: {
+    taskRadius: '4px',
+  },
+  dimensions: {
+    sidebarWidth: 250,
+    rowHeight: 40,
+    taskHeight: 24,
+    navigatorHeight: 40,
+    containerWidth: 1200,
+    containerHeight: 600,
+  },
+  classes: {
+    rowText: 'text-sm text-slate-400 truncate select-none',
+  }
+};
+
+export const makeTheme: (input: Partial<GanttTheme>) => GanttTheme = (input) => {
+    return {
+        ...GANTT_THEME,
+        ...input,
+        colors:{
+            ...GANTT_THEME.colors,
+            ...input.colors
+        },
+        styles:{
+            ...GANTT_THEME.styles,
+            ...input.styles
+        },
+        dimensions:{
+            ...GANTT_THEME.dimensions,
+            ...input.dimensions
+        },
+        classes:{
+            ...GANTT_THEME.classes,
+            ...input.classes
+        },
+    }
+}

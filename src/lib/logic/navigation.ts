@@ -1,4 +1,5 @@
 import { calculateZoom, pixelToTime, type ViewportConfig } from './viewport';
+import type {GanttTheme} from "$lib/gantt-theme";
 
 /**
  * Handles the logic for zooming via the mouse wheel.
@@ -8,11 +9,14 @@ export function handleWheelZoom(
   event: WheelEvent,
   container: HTMLElement,
   config: ViewportConfig,
+  theme: GanttTheme,
   minDurationMs = 1000 * 60 * 60, // 1 hour min zoom
   maxDurationMs = 1000 * 60 * 60 * 24 * 365 // 1 year max zoom
 ): { start: Date; end: Date } | null {
   // Only zoom if Ctrl/Meta is pressed, otherwise let it be a normal scroll
   if (!event.ctrlKey && !event.metaKey) return null;
+
+  const containerWidth = theme.dimensions.containerWidth - theme.dimensions.sidebarWidth
 
   event.preventDefault();
 

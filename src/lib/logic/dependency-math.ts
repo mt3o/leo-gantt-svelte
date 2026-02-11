@@ -1,5 +1,6 @@
 import type { Dependency, Task, ViewportConfig } from '../types/gantt';
 import { timeToPixel } from './viewport';
+import type {GanttTheme} from "$lib/gantt-theme";
 
 export interface LineCoords {
   id: string;
@@ -21,7 +22,8 @@ export function calculateDependencyLines(
   rowIndexMap: Map<string, number>,
   viewportConfig: ViewportConfig,
   rowHeight: number,
-  taskHeight: number
+  taskHeight: number,
+  theme: GanttTheme,
 ): LineCoords[] {
   const taskMap = new Map(tasks.map((t) => [t.id, t]));
   const lines: LineCoords[] = [];
@@ -45,9 +47,9 @@ export function calculateDependencyLines(
           id: `${dep.from}-${dep.to}`,
           from: dep.from,
           to: dep.to,
-          x1: timeToPixel(fromTask.end, viewportConfig),
+          x1: timeToPixel(fromTask.end, viewportConfig, theme),
           y1: fromY + verticalOffset,
-          x2: timeToPixel(toTask.start, viewportConfig),
+          x2: timeToPixel(toTask.start, viewportConfig, theme),
           y2: toY + verticalOffset
         });
       }

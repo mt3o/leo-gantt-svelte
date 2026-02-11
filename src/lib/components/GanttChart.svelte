@@ -1,5 +1,6 @@
 <script lang="ts">
-  import type { Task, FlattenedItem, Dependency } from '$lib/types/gantt';
+    import type {Task, FlattenedItem, Dependency, ViewportConfig} from '$lib/types/gantt';
+  import { GANTT_THEME, type GanttTheme } from '$lib/gantt-theme';
 
   // Sub-components
   import TaskBar from './Shapes/TaskBar.svelte';
@@ -25,11 +26,7 @@
     selectedTaskId?: string | null;
 
     // Config
-    containerHeight: number;
-    containerWidth: number;
-    rowHeight?: number;
-    taskHeight?: number;
-    sidebarWidth?: number;
+    theme?: Partial<GanttTheme>;
 
     // Actions
     onTaskClick?: (id: string) => void;
@@ -45,19 +42,27 @@
     viewEnd,
     scrollTop,
     selectedTaskId = null,
-    containerHeight,
-    containerWidth,
-    rowHeight = 40,
-    taskHeight = 24,
-    sidebarWidth = 250,
+    theme = {},
     onTaskClick,
     onRowToggle,
     onScroll
   }:Props = $props();
 
+  const _theme: GanttTheme = {
+      ...GANTT_THEME,
+      ...theme,
+  }
+
+  const rowHeight = _theme.dimensions.rowHeight;
+  const taskHeight = _theme.dimensions.taskHeight;
+  const sidebarWidth = _theme.dimensions.sidebarWidth;
+
   // --- Logic ---
 
-  const viewportConfig = $derived({ viewStart, viewEnd, containerWidth: containerWidth - sidebarWidth });
+  const viewportConfig = $derived<ViewportConfig>({
+      viewStart,
+      viewEnd
+  });
 
   const virtualData = $derived(
     getVisibleElements(
@@ -66,7 +71,7 @@
       viewStart,
       viewEnd,
       scrollTop,
-      containerHeight,
+      _theme.dimensions.containerHeight,
       rowHeight
     )
   );
@@ -87,7 +92,8 @@
       rowIndexMap,
       viewportConfig,
       rowHeight,
-      taskHeight
+      taskHeight,
+      _theme,
     )
   );
 
@@ -109,7 +115,7 @@
     return { normalLines: normal, highlightedLines: highlighted };
   });
 
-  const gridTicks = $derived(generateTicks(viewportConfig));
+  const gridTicks = $derived(generateTicks(viewportConfig, _theme));
   const totalHeight = $derived(rows.length * rowHeight);
 
   function handleScroll(e: Event) {
@@ -118,12 +124,13 @@
   }
 </script>
 
-<div class="flex flex-col border border-slate-200 bg-white shadow-sm overflow-hidden"
-     style:height="{containerHeight}px"
-     style:width="{containerWidth}px">
-
+<div class="flex flex-col border border-slate-200 shadow-sm overflow-hidden"
+     class:dark={_theme.colors.background.includes('slate-900')}
+     style:height="{_theme.dimensions.containerHeight}px"
+     style:width="{_theme.dimensions.containerWidth}px"
+>
   <div class="flex" style:margin-left="{sidebarWidth}px">
-    <Header config={viewportConfig} />
+    <Header theme={_theme} viewportConfig={viewportConfig} />
   </div>
 
   <div
@@ -131,6 +138,7 @@
     onscroll={handleScroll}
   >
     <RowsContainer
+      theme={_theme}
       visibleRows={virtualData.visibleRows}
       totalCount={rows.length}
       startIndex={virtualData.startIndex}
@@ -139,7 +147,10 @@
       onRowToggle={onRowToggle}
     />
 
-    <div class="relative flex-1 bg-slate-50 shadow-inner">
+    <div
+            class="relative flex-1 shadow-inner"
+            class:bg-slate-50={!_theme.colors.background.includes('slate-900')}
+            class:bg-slate-800={_theme.colors.background.includes('slate-900')}>
       <svg
         class="absolute top-0 left-0 w-full pointer-events-none"
         style:height="{totalHeight}px"
@@ -152,7 +163,7 @@
               y1="0"
               x2={tick.x}
               y2="100%"
-              class={tick.isMajor ? "stroke-slate-300" : "stroke-slate-200"}
+              class={tick.isMajor ? "stroke-slate-300 dark:stroke-slate-700" : "stroke-slate-200 dark:stroke-slate-800"}
               stroke-dasharray={tick.isMajor ? "" : "4 2"}
             />
           {/each}
@@ -160,22 +171,23 @@
           <!-- Horizontal Grid Lines -->
           {#each virtualData.visibleRows as _, i}
             {@const y = (virtualData.startIndex + i) * rowHeight}
-            <line x1="0" y1={y} x2="100%" y2={y} class="stroke-slate-200" />
+            <line x1="0" y1={y} x2="100%" y2={y} class="stroke-slate-200 dark:stroke-slate-800" />
           {/each}
         </g>
 
         <!-- Normal Lines (Below Tasks) -->
-        <DependencyLines lines={normalLines} />
+        <DependencyLines {theme} lines={normalLines} />
 
         <g class="tasks-layer pointer-events-auto">
           {#each virtualData.visibleTasks as task (task.id)}
-            {@const x = timeToPixel(task.start, viewportConfig)}
-            {@const width = timeToPixel(task.end, viewportConfig) - x}
+            {@const x = timeToPixel(task.start, viewportConfig, _theme)}
+            {@const width = timeToPixel(task.end, viewportConfig, _theme) - x}
             {@const rowIndex = rowIndexMap.get(task.rowId)}
 
             {#if rowIndex !== undefined}
               {@const y = rowIndex * rowHeight + (rowHeight - taskHeight) / 2}
               <TaskBar
+                theme={_theme}
                 {task}
                 {x}
                 {y}
@@ -188,7 +200,7 @@
         </g>
 
         <!-- Highlighted Lines (Above Tasks) -->
-        <DependencyLines lines={highlightedLines} highlighted={true} />
+        <DependencyLines {theme} lines={highlightedLines} highlighted={true} />
       </svg>
     </div>
   </div>

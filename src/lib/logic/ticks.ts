@@ -1,5 +1,6 @@
 import type { ViewportConfig } from '../types/gantt';
 import { timeToPixel } from './viewport';
+import type {GanttTheme} from "$lib/gantt-theme";
 
 export interface Tick {
   date: Date;
@@ -32,10 +33,10 @@ function getWeekNumber(d: Date): number {
     return weekNo;
 }
 
-export function generateTicks(config: ViewportConfig): Tick[] {
+export function generateTicks(config: ViewportConfig, theme: GanttTheme): Tick[] {
   const { viewStart, viewEnd } = config;
   const durationMs = viewEnd.getTime() - viewStart.getTime();
-  const pixelsPerMs = config.containerWidth / durationMs;
+  const pixelsPerMs = theme.dimensions.containerWidth / durationMs;
   const pixelsPerDay = pixelsPerMs * 24 * 3600 * 1000;
 
   const ticks: Tick[] = [];
@@ -49,7 +50,7 @@ export function generateTicks(config: ViewportConfig): Tick[] {
     while (curr < viewEnd) {
       ticks.push({
         date: new Date(curr),
-        x: timeToPixel(curr, config),
+        x: timeToPixel(curr, config, theme),
         label: curr.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
         isMajor: true,
       });
@@ -62,7 +63,7 @@ export function generateTicks(config: ViewportConfig): Tick[] {
     while (curr < viewEnd) {
       ticks.push({
         date: new Date(curr),
-        x: timeToPixel(curr, config),
+        x: timeToPixel(curr, config, theme),
         label: `W${getWeekNumber(curr)}`,
         isMajor: true,
       });
@@ -74,7 +75,7 @@ export function generateTicks(config: ViewportConfig): Tick[] {
     while (curr < viewEnd) {
         ticks.push({
             date: new Date(curr),
-            x: timeToPixel(curr, config),
+            x: timeToPixel(curr, config, theme),
             label: curr.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
             isMajor: true
         });
@@ -86,7 +87,7 @@ export function generateTicks(config: ViewportConfig): Tick[] {
     while (curr < viewEnd) {
       ticks.push({
         date: new Date(curr),
-        x: timeToPixel(curr, config),
+        x: timeToPixel(curr, config, theme),
         label: curr.toLocaleDateString('en-US', { day: 'numeric', month: 'short' }),
         isMajor: true,
       });
@@ -102,15 +103,15 @@ export function generateTicks(config: ViewportConfig): Tick[] {
             break;
         }
     }
-    
+
     let currMs = Math.ceil(viewStart.getTime() / intervalMs) * intervalMs;
     while (currMs < viewEnd.getTime()) {
         const date = new Date(currMs);
         const isStartOfDay = date.getHours() === 0 && date.getMinutes() === 0;
         ticks.push({
             date,
-            x: timeToPixel(date, config),
-            label: isStartOfDay 
+            x: timeToPixel(date, config, theme),
+            label: isStartOfDay
                 ? date.toLocaleDateString('en-US', { day: 'numeric', month: 'short' })
                 : date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }),
             isMajor: isStartOfDay
