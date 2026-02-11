@@ -3,18 +3,26 @@
     import Row from '$lib/components/Grid/Row.svelte';
     import Navigator from '$lib/components/Timeline/Navigator.svelte';
     import Header from '$lib/components/Grid/Header.svelte';
+    import RowsContainer from '$lib/components/Grid/RowsContainer.svelte';
+    import DependencyLines from '$lib/components/Shapes/DependencyLines.svelte';
+
     import {GANTT_THEME, GANTT_THEME_DARK} from '$lib/gantt-theme';
-    import type {Task, FlattenedItem, ViewportConfig} from '$lib/types/gantt';
+    import type {Task, FlattenedItem, ViewportConfig, Dependency} from '$lib/types/gantt';
     import DatePicker from "$lib/demo/DatePicker.svelte";
+    import { calculateDependencyLines } from '$lib/logic/dependency-math';
+    import { timeToPixel } from '$lib/logic/viewport';
+    import { getVisibleElements } from '$lib/logic/virtualizer';
+
+    // --- Global State ---
+    let isDarkTheme = $state(false);
+    const currentTheme = $derived(isDarkTheme ? GANTT_THEME_DARK : GANTT_THEME);
+    const formatDate = (date: Date) => date.toISOString().split('T')[0];
 
     // --- TaskBar Demo State ---
     let taskWidth = $state(200);
     let taskLabel = $state('Demo Task');
     let taskColor = $state('#3b82f6');
     let taskTextColor = $state('#fff');
-    let isDarkTheme = $state(false);
-
-    const formatDate = (date: Date) => date.toISOString().split('T')[0];
 
     const demoTask = $derived<Task>({
         id: 'demo-task',
@@ -25,8 +33,6 @@
         color: taskColor,
         textColor: taskTextColor,
     });
-
-    const currentTheme = $derived(isDarkTheme ? GANTT_THEME_DARK : GANTT_THEME);
 
     // --- Row Demo State ---
     let rowLabel = $state('Demo Row');
@@ -57,6 +63,70 @@
         viewStart: new Date('2024-01-01'),
         viewEnd: new Date(new Date('2024-01-01').getTime() + (15 * 24 * 60 * 60 * 1000 * headerZoom)),
     });
+
+    // --- RowsContainer Demo State ---
+    let rcScrollTop = $state(0);
+    let rcContainerHeight = $state(200);
+    let rcRowHeight = $state(40);
+
+    const rcAllRows: FlattenedItem[] = Array.from({ length: 50 }, (_, i) => ({
+        id: `rc-row-${i}`,
+        label: `Row ${i + 1}`,
+        type: 'row',
+        level: i % 3,
+        parentId: null,
+        isVisible: true
+    }));
+
+    const rcVirtualData = $derived(getVisibleElements(
+        [], // No tasks needed for row virtualization
+        rcAllRows,
+        new Date(), new Date(), // Time doesn't matter for rows
+        rcScrollTop,
+        rcContainerHeight,
+        rcRowHeight
+    ));
+
+    // --- DependencyLines Demo State ---
+    let depTask1StartOffset = $state(0); // Days from start
+    let depTask1Duration = $state(5); // Days
+    let depTask2StartOffset = $state(8); // Days from start
+    let depTask2Duration = $state(5); // Days
+    let depHighlighted = $state(false);
+
+    const depViewStart = new Date('2024-01-01');
+    const depViewEnd = new Date('2024-01-31');
+    const depContainerWidth = 800;
+    const depViewportConfig = { viewStart: depViewStart, viewEnd: depViewEnd, containerWidth: depContainerWidth };
+
+    const depTask1 = $derived<Task>({
+        id: 't1', rowId: 'r1',
+        start: new Date(depViewStart.getTime() + depTask1StartOffset * 86400000),
+        end: new Date(depViewStart.getTime() + (depTask1StartOffset + depTask1Duration) * 86400000),
+        label: 'Task 1', color: '#3b82f6'
+    });
+
+    const depTask2 = $derived<Task>({
+        id: 't2', rowId: 'r2',
+        start: new Date(depViewStart.getTime() + depTask2StartOffset * 86400000),
+        end: new Date(depViewStart.getTime() + (depTask2StartOffset + depTask2Duration) * 86400000),
+        label: 'Task 2', color: '#10b981'
+    });
+
+    const depTasks = $derived([depTask1, depTask2]);
+    const depDependencies: Dependency[] = [{ from: 't1', to: 't2' }];
+
+    const depRowIndexMap = new Map([['r1', 0], ['r2', 2]]); // Task 1 on row 0, Task 2 on row 2
+
+    const depLines = $derived(calculateDependencyLines(
+        depDependencies,
+        depTasks,
+        depRowIndexMap,
+        depViewportConfig,
+        40, // rowHeight
+        24,  // taskHeight
+        currentTheme
+    ));
 
 </script>
 
@@ -147,38 +217,62 @@
         </div>
     </section>
 
+    <!-- RowsContainer Demo -->
+    <section class="space-y-4">
+        <h2 class="text-xl font-semibold">RowsContainer (Virtualization)</h2>
+        <div class="flex gap-8">
+            <div class="w-64 space-y-4 p-4 border rounded" class:border-slate-700={isDarkTheme}>
+                <label class="block">
+                    <span class="text-sm opacity-70">Scroll Top: {rcScrollTop}px</span>
+                    <input type="range" min="0" max={(rcAllRows.length * rcRowHeight) - rcContainerHeight} bind:value={rcScrollTop} class="w-full"/>
+                </label>
+                <label class="block">
+                    <span class="text-sm opacity-70">Container Height: {rcContainerHeight}px</span>
+                    <input type="range" min="100" max="500" bind:value={rcContainerHeight} class="w-full"/>
+                </label>
+                <div class="text-xs text-slate-500">
+                    <p>Total Rows: {rcAllRows.length}</p>
+                    <p>Visible Rows: {rcVirtualData.visibleRows.length}</p>
+                    <p>Start Index: {rcVirtualData.startIndex}</p>
+                </div>
+            </div>
+
+            <div class="flex-1 border rounded overflow-hidden relative" style:height="{rcContainerHeight}px">
+                <!-- We need a wrapper to simulate the scrollable area -->
+                <div class="absolute top-0 left-0 w-full h-full overflow-hidden">
+                     <RowsContainer
+                        visibleRows={rcVirtualData.visibleRows}
+                        totalCount={rcAllRows.length}
+                        startIndex={rcVirtualData.startIndex}
+                        rowHeight={rcRowHeight}
+                        width={300}
+                        theme={currentTheme}
+                        onRowToggle={(id) => alert(`Toggle ${id}`)}
+                    />
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Navigator Demo -->
     <section class="space-y-4">
         <h2 class="text-xl font-semibold">Navigator</h2>
         <div class="flex gap-8">
             <div class="w-64 space-y-4 p-4 border rounded" class:border-slate-700={isDarkTheme}>
-                <div class="text-sm">
-
-
-                    <p>total start: {formatDate(navTotalStart)}</p>
-                    <p>total end: {formatDate(navTotalEnd)}</p>
-                    <p>view start: {formatDate(navViewStart)}</p>
-                    <p>view end: {formatDate(navViewEnd)}</p>
-
+                <div class="text-sm space-y-2">
                     <p><b>Change the dates:</b></p>
-
-                    <p>Total Start:
-
-                        <DatePicker
-                                bind:value={navTotalStart}
-                                max={navViewStart}
-                        />
-                    </p>
-                    <p>Total End:
-                        <DatePicker
-                                bind:value={navTotalEnd}
-                                min={navViewEnd}
-                        />
-                    </p>
-                    <p><i>Total start can't be later than selection start, total end can't be earlier than selection
-                        end!</i></p>
-                    <p>Selection Start: {navViewStart.toLocaleDateString()}</p>
-                    <p>Selection End: {navViewEnd.toLocaleDateString()}</p>
+                    <label class="block">
+                        <span class="text-xs opacity-70">Total Start</span>
+                        <DatePicker bind:value={navTotalStart} max={navViewStart} />
+                    </label>
+                    <label class="block">
+                        <span class="text-xs opacity-70">Total End</span>
+                        <DatePicker bind:value={navTotalEnd} min={navViewEnd} />
+                    </label>
+                    <div class="border-t pt-2 mt-2">
+                         <p>Selection Start: {navViewStart.toLocaleDateString()}</p>
+                         <p>Selection End: {navViewEnd.toLocaleDateString()}</p>
+                    </div>
                 </div>
             </div>
 
@@ -190,16 +284,16 @@
                         viewEnd={navViewEnd}
                         theme={currentTheme}
                         onRangeChange={(s, e) => {
-            navViewStart = s;
-            navViewEnd = e;
-          }}
+                            navViewStart = s;
+                            navViewEnd = e;
+                        }}
                 />
             </div>
         </div>
     </section>
 
-      <!-- Header Demo -->
-      <section class="space-y-4">
+    <!-- Header Demo -->
+    <section class="space-y-4">
         <h2 class="text-xl font-semibold">Header (Adaptive Ticks)</h2>
         <div class="flex gap-8">
           <div class="w-64 space-y-4 p-4 border rounded" class:border-slate-700={isDarkTheme}>
@@ -221,6 +315,60 @@
             />
           </div>
         </div>
-      </section>
+    </section>
+
+    <!-- DependencyLines Demo -->
+    <section class="space-y-4">
+        <h2 class="text-xl font-semibold">DependencyLines</h2>
+        <div class="flex gap-8">
+            <div class="w-64 space-y-4 p-4 border rounded" class:border-slate-700={isDarkTheme}>
+                <label class="block">
+                    <span class="text-sm opacity-70">Task 1 Start (Day)</span>
+                    <input type="range" min="0" max="20" bind:value={depTask1StartOffset} class="w-full"/>
+                </label>
+                <label class="block">
+                    <span class="text-sm opacity-70">Task 2 Start (Day)</span>
+                    <input type="range" min="0" max="20" bind:value={depTask2StartOffset} class="w-full"/>
+                </label>
+                <label class="flex items-center gap-2 mt-4">
+                    <input type="checkbox" bind:checked={depHighlighted}/>
+                    <span>Highlight Line</span>
+                </label>
+            </div>
+
+            <div class="flex-1 border rounded bg-slate-50 dark:bg-slate-800 p-4 overflow-hidden">
+                <svg width="800" height="200">
+                    <!-- Grid Lines for context -->
+                    <line x1="0" y1="40" x2="800" y2="40" class="stroke-slate-200" />
+                    <line x1="0" y1="120" x2="800" y2="120" class="stroke-slate-200" />
+
+                    <!-- Dependency Lines -->
+                    <DependencyLines
+                        lines={depLines}
+                        highlighted={depHighlighted}
+                        theme={currentTheme}
+                    />
+
+                    <!-- Tasks -->
+                    <TaskBar
+                        task={depTask1}
+                        x={timeToPixel(depTask1.start, depViewportConfig,currentTheme)}
+                        y={0 * 40 + 8}
+                        width={timeToPixel(depTask1.end, depViewportConfig,currentTheme) - timeToPixel(depTask1.start, depViewportConfig,currentTheme)}
+                        height={24}
+                        theme={currentTheme}
+                    />
+                    <TaskBar
+                        task={depTask2}
+                        x={timeToPixel(depTask2.start, depViewportConfig,currentTheme)}
+                        y={2 * 40 + 8}
+                        width={timeToPixel(depTask2.end, depViewportConfig,currentTheme) - timeToPixel(depTask2.start, depViewportConfig,currentTheme)}
+                        height={24}
+                        theme={currentTheme}
+                    />
+                </svg>
+            </div>
+        </div>
+    </section>
 
 </div>
