@@ -1,5 +1,5 @@
-import { pixelToTime, type ViewportConfig } from './viewport';
 import type {GanttTheme} from "$lib/gantt-theme";
+import type {ViewportConfig} from "$lib/types/gantt";
 
 /**
  * Calculates the new start and end dates based on pixel delta.
