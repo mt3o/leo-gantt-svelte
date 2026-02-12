@@ -18,7 +18,8 @@ import type {
 } from '$lib/types/gantt';
 
 import{
-    type GanttTheme, GANTT_THEME, GANTT_THEME_DARK
+    type GanttTheme,
+    GANTT_THEME, GANTT_THEME_DARK
 } from '$lib/gantt-theme'
 
 export {
@@ -32,9 +33,9 @@ export {
 }
 export type {
     FlattenedItem,
+    ResourceRow,
     ResourceGroup,
     Dependency,
-    ResourceRow,
     Task,
     ViewportConfig,
     TaskId,

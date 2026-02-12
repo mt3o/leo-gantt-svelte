@@ -32,10 +32,10 @@
 
     <!-- Active Demo Container -->
     <div class="flex-1 relative overflow-hidden bg-slate-100">
-        {#each demos as demo}
-            {#if activeDemo === demo.id}
+        {#each demos as Demo}
+            {#if activeDemo === Demo.id}
                 <div class="absolute inset-0 overflow-auto">
-                    <svelte:component this={demo.component} />
+                    <Demo.component />
                 </div>
             {/if}
         {/each}
