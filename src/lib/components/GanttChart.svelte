@@ -38,14 +38,14 @@
     tasks = [],
     rows = [],
     dependencies = [],
-    viewStart,
-    viewEnd,
-    scrollTop,
+    viewStart = new Date(),
+    viewEnd = new Date(),
+    scrollTop = 0,
     selectedTaskId = null,
     theme = {},
-    onTaskClick,
-    onRowToggle,
-    onScroll
+    onTaskClick = () => {},
+    onRowToggle = () => {},
+    onScroll = () => {}
   }:Props = $props();
 
   const _theme = $derived({...GANTT_THEME, ...theme});
@@ -112,7 +112,7 @@
     return { normalLines: normal, highlightedLines: highlighted };
   });
 
-  const gridTicks = $derived(generateTicks(viewportConfig, _theme));
+  const gridTicks = $derived(viewportConfig && _theme ? generateTicks(viewportConfig, _theme) : []);
   const totalHeight = $derived(rows.length * rowHeight);
 
   function handleScroll(e: Event) {
@@ -126,7 +126,7 @@
      style:height="{_theme.dimensions.containerHeight}px"
      style:width="{_theme.dimensions.containerWidth}px"
 >
-  <div class="flex" style:margin-left="{sidebarWidth}px">
+  <div class="flex" style:margin-left="{sidebarWidth ?? 0}px">
     <Header theme={_theme} viewportConfig={viewportConfig} />
   </div>
 
@@ -177,8 +177,8 @@
 
         <g class="tasks-layer pointer-events-auto">
           {#each virtualData.visibleTasks as task (task.id)}
-            {@const x = timeToPixel(task.start, viewportConfig, _theme)}
-            {@const width = timeToPixel(task.end, viewportConfig, _theme) - x}
+            {@const x = viewportConfig && _theme ? timeToPixel(task.start, viewportConfig, _theme) : 0}
+            {@const width = viewportConfig && _theme ? timeToPixel(task.end, viewportConfig, _theme) - x : 0}
             {@const rowIndex = rowIndexMap.get(task.rowId)}
 
             {#if rowIndex !== undefined}

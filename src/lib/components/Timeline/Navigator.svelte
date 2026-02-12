@@ -14,13 +14,13 @@
     }
 
     let {
-        totalStart,
-        totalEnd,
-        viewStart,
-        viewEnd,
+        totalStart = new Date(),
+        totalEnd = new Date(),
+        viewStart = new Date(),
+        viewEnd = new Date(),
         height = 40,
         theme = {},
-        onRangeChange
+        onRangeChange = () => {}
     }: Props = $props();
 
     const _theme = $derived({...GANTT_THEME, ...theme})
@@ -33,8 +33,8 @@
         containerWidth: _theme.dimensions.containerWidth - _theme.dimensions.sidebarWidth,
     });
 
-    const brushX = $derived(timeToPixel(viewStart, navConfig, _theme));
-    const brushWidth = $derived(timeToPixel(viewEnd, navConfig, _theme) - brushX);
+    const brushX = $derived(viewStart && navConfig && _theme ? timeToPixel(viewStart, navConfig, _theme) : 0);
+    const brushWidth = $derived(viewEnd && navConfig && _theme ? Math.max(0, timeToPixel(viewEnd, navConfig, _theme) - brushX) : 0);
 
     let dragMode: 'pan' | 'resize-left' | 'resize-right' | null = $state(null);
     let startX = 0;
@@ -122,12 +122,12 @@
 <div
         tabindex="0"
         bind:this={containerRef}
-        class="NAVIGATOR relative p-4 border-b cursor-crosshair select-none {_theme.colors.navigatorBackground}"
-        class:border-slate-200={_theme.colors.background === 'bg-white'}
-        class:border-slate-700={_theme.colors.background !== 'bg-white'}
-        style:margin-left="{_theme.dimensions.sidebarWidth}px"
+        class="NAVIGATOR relative p-4 border-b cursor-crosshair select-none {_theme?.colors?.navigatorBackground ?? ''}"
+        class:border-slate-200={_theme?.colors?.background === 'bg-white'}
+        class:border-slate-700={_theme?.colors?.background !== 'bg-white'}
+        style:margin-left="{_theme?.dimensions?.sidebarWidth ?? 0}px"
         style:height="{height}px"
-        style:width="{navConfig.containerWidth}px"
+        style:width="{navConfig?.containerWidth ?? 0}px"
         onmousedown={handlePanStart}
         role="slider"
 >
@@ -137,11 +137,11 @@
     >
 
     <span class={`text-[10px] ${_theme.colors.navigatorText}`}>
-        {totalStart.toLocaleDateString()}
+        {totalStart?.toLocaleDateString?.() ?? ''}
     </span>
-        <div class="flex-1 border-t border-dotted border-slate-400 dark:border-slate-600 mx-2"></div>
-        <span class={`text-[10px] ${_theme.colors.navigatorText}`}>
-        {totalEnd.toLocaleDateString()}
+    <div class="flex-1 border-t border-dotted border-slate-400 dark:border-slate-600 mx-2"></div>
+    <span class={`text-[10px] ${_theme.colors.navigatorText}`}>
+        {totalEnd?.toLocaleDateString?.() ?? ''}
     </span>
 
     </div>

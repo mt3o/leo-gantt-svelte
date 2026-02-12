@@ -12,16 +12,16 @@
   }>();
 
   const _theme = $derived({...GANTT_THEME, ...theme});
-  const ticks = $derived(generateTicks(viewportConfig, _theme));
+  const ticks = $derived(viewportConfig && _theme ? generateTicks(viewportConfig, _theme) : []);
 </script>
 
 
 <div
-        class={`HEADER ${_theme.colors.background} h-10 border-b border-slate-200 relative overflow-hidden`}
+        class={`HEADER ${_theme?.colors?.background ?? ''} h-10 border-b border-slate-200 relative overflow-hidden`}
         style={`width: 100%;`}
 >
 
-  <svg width={_theme.dimensions.containerWidth} height={_theme.dimensions.navigatorHeight}>
+  <svg width={_theme?.dimensions?.containerWidth ?? 0} height={_theme?.dimensions?.navigatorHeight ?? 0}>
     {#each ticks as tick}
       <line
         x1={tick.x}

@@ -10,9 +10,12 @@ import type {GanttTheme} from "$lib/gantt-theme";
  * @returns The horizontal pixel coordinate relative to the container start.
  */
 export function timeToPixel(date: Date, config: ViewportConfig, theme: GanttTheme): number {
+  if (!date || !config || !theme) return 0;
   const { viewStart, viewEnd } = config;
+  if (!viewStart || !viewEnd) return 0;
   const containerWidth = theme.dimensions.containerWidth - theme.dimensions.sidebarWidth;
   const totalMs = viewEnd.getTime() - viewStart.getTime();
+  if (totalMs === 0) return 0;
   const dateMs = date.getTime() - viewStart.getTime();
 
   return (dateMs / totalMs) * containerWidth;
@@ -28,9 +31,12 @@ export function timeToPixel(date: Date, config: ViewportConfig, theme: GanttThem
  * @returns The date corresponding to the pixel coordinate.
  */
 export function pixelToTime(px: number, config: ViewportConfig, theme: GanttTheme): Date {
+  if (px === undefined || !config || !theme) return new Date();
   const containerWidth = theme.dimensions.containerWidth - theme.dimensions.sidebarWidth;
-    const { viewStart, viewEnd } = config;
+  const { viewStart, viewEnd } = config;
+  if (!viewStart || !viewEnd) return new Date();
   const totalMs = viewEnd.getTime() - viewStart.getTime();
+  if (totalMs === 0) return new Date(viewStart.getTime());
   const timeOffset = (px / containerWidth) * totalMs;
 
   return new Date(viewStart.getTime() + timeOffset);

@@ -47,8 +47,11 @@ function getWeekNumber(d: Date): number {
  * @returns An array of Tick objects.
  */
 export function generateTicks(config: ViewportConfig, theme: GanttTheme): Tick[] {
+  if (!config || !theme) return [];
   const { viewStart, viewEnd } = config;
+  if (!viewStart || !viewEnd) return [];
   const durationMs = viewEnd.getTime() - viewStart.getTime();
+  if (durationMs <= 0) return [];
   const pixelsPerMs = theme.dimensions.containerWidth / durationMs;
   const pixelsPerDay = pixelsPerMs * 24 * 3600 * 1000;
 
