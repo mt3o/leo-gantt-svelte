@@ -33,6 +33,35 @@ export interface GanttTheme {
   }
 }
 
+export const mergeGanttTheme = (a: Partial<GanttTheme>, b?: Partial<GanttTheme>, fallback?: GanttTheme): GanttTheme => {
+    if(!fallback)
+        fallback = GANTT_THEME;
+    if(!b)
+        b={};
+
+    return {
+        colors: {
+            ...fallback.colors,
+            ...b.colors,
+            ...a.colors,
+        },
+        styles: {
+            ...fallback.styles,
+            ...a.styles,
+            ...b.styles,
+        },
+        dimensions: {
+            ...fallback.dimensions,
+            ...b.dimensions,
+            ...a.dimensions,
+        },
+        classes: {
+            ...fallback.classes,
+            ...b.classes,
+            ...a.classes,
+        },
+    }
+}
 export const GANTT_THEME: GanttTheme = {
   colors: {
     background: 'bg-white',

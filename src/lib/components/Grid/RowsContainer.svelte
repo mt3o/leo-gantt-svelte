@@ -28,7 +28,7 @@
 </script>
 
 <div
-  class="ROW_CONTAINER relative border-r border-slate-200 bg-white overflow-hidden flex-shrink-0"
+  class="row-container relative border-r border-slate-200 bg-white overflow-hidden flex-shrink-0"
   style:width="{width}px"
   style:height="{totalHeight}px"
 >

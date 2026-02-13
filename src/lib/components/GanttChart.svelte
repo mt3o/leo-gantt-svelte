@@ -147,7 +147,8 @@
     <div
             class="relative flex-1 shadow-inner"
             class:bg-slate-50={!_theme.colors.background.includes('slate-900')}
-            class:bg-slate-800={_theme.colors.background.includes('slate-900')}>
+            class:bg-slate-800={_theme.colors.background.includes('slate-900')}
+            style:height="{totalHeight}px">
       <svg
         class="absolute top-0 left-0 w-full pointer-events-none"
         style:height="{totalHeight}px"

@@ -1,6 +1,6 @@
 # Svelte 5 High-Performance Gantt Engine
 
-A professional-grade, headless-first Gantt chart component built with **Svelte 5**. Designed for massive datasets (thousands of tasks), deep resource nesting, and fluid time-navigation.
+A Gantt chart component built with **Svelte 5**. Designed for deep resource nesting, and fluid time-navigation.
 
 ## 🚀 Key Features
 - **Virtual 2D Rendering:** Horizontal (Time) and Vertical (Resource) virtualization to keep the DOM lean and the framerate high (60 FPS) even with 5,000+ tasks.

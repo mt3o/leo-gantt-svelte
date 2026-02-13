@@ -122,7 +122,7 @@
 <div
         tabindex="0"
         bind:this={containerRef}
-        class="NAVIGATOR relative p-4 border-b cursor-crosshair select-none {_theme?.colors?.navigatorBackground ?? ''}"
+        class="navigator relative p-4 border-b cursor-crosshair select-none {_theme?.colors?.navigatorBackground ?? ''}"
         class:border-slate-200={_theme?.colors?.background === 'bg-white'}
         class:border-slate-700={_theme?.colors?.background !== 'bg-white'}
         style:margin-left="{_theme?.dimensions?.sidebarWidth ?? 0}px"
@@ -131,49 +131,40 @@
         onmousedown={handlePanStart}
         role="slider"
 >
-    <div style="height: 40px;" class="FIX_SIZE"></div>
     <div
-            class="absolute inset-0 flex items-center px-2 opacity-50 pointer-events-none"
+            class="navigator-bar absolute inset-0 flex items-center px-2 opacity-50 pointer-events-none"
     >
 
-    <span class={`text-[10px] ${_theme.colors.navigatorText}`}>
+    <span class="navigator-date-start text-[10px] {_theme.colors.navigatorText}">
         {totalStart?.toLocaleDateString?.() ?? ''}
     </span>
-    <div class="flex-1 border-t border-dotted border-slate-400 dark:border-slate-600 mx-2"></div>
-    <span class={`text-[10px] ${_theme.colors.navigatorText}`}>
+
+    <div class="dotted-line flex-1 border-t border-dotted border-slate-400 dark:border-slate-600 mx-2"></div>
+
+    <span class="navigator-date-end text-[10px] {_theme.colors.navigatorText}">
         {totalEnd?.toLocaleDateString?.() ?? ''}
     </span>
 
     </div>
 
     <div
-            class="TIMESPAN_SELECTOR {_theme.colors.navigatorBrush} border-blue-500 absolute top-0 h-full border-x transition-shadow group"
+            class="timespan-selector  border-blue-500 absolute top-0 h-full border-x transition-shadow {_theme.colors.navigatorBrush}"
             class:shadow-lg={dragMode !== null}
             style:left="{brushX}px"
             style:width="{brushWidth}px"
-            style="box-shadow:0 0 5px 0 red"
     >
         <!-- Left Handle -->
-        <div
-                class="LEFT_HANDLE absolute top-0 left-0
-                h-full w-3 -ml-1.5
-                cursor-ew-resize
-                flex
-                items-center
-                justify-center
-                hover:bg-blue-400/20"
+        <div class="timespan-selector-left-handle left-0 -ml-1.75 absolute top-0 h-full w-3 flex items-center justify-center cursor-ew-resize hover:bg-blue-400/20"
                 onmousedown={(e) => handleResizeStart(e, 'left')}
         >
-            <div class={`${_theme.colors.navigatorHandle} w-[2px] h-4 rounded-full`}></div>
+            <div class="timespan-selector-handle-bar w-[5px] h-4 rounded-full {_theme.colors.navigatorHandle}"></div>
         </div>
 
         <!-- Right Handle -->
-        <div
-                class="absolute top-0 right-0 h-full w-3 -mr-1.5 cursor-ew-resize flex items-center justify-center hover:bg-blue-500/20"
+        <div class="timespan-selector-right-handle right-0 -mr-1.5 absolute top-0 h-full w-3 flex items-center justify-center cursor-ew-resize hover:bg-blue-400/20"
                 onmousedown={(e) => handleResizeStart(e, 'right')}
         >
-            <div class={`${_theme.colors.navigatorHandle} w-[2px] h-4 rounded-full`}
-            ></div>
+            <div class="timespan-selector-handle-bar w-[5px] h-4 rounded-full {_theme.colors.navigatorHandle}"></div>
         </div>
     </div>
 </div>

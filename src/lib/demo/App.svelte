@@ -3,12 +3,14 @@
     import GanttDemo from "$lib/demo/GanttDemo.svelte";
     import HeatmapDemo from "$lib/demo/HeatmapDemo.svelte";
     import HeatmapDemo2 from "$lib/demo/HeatmapDemo2.svelte";
+    import GanttDemoDark from "$lib/demo/GanttDemoDark.svelte";
 
     let activeDemo = $state('showcase');
 
     const demos = [
         { id: 'showcase', label: 'Component Showcase', component: ComponentShowcase },
         { id: 'gantt', label: 'Standard Gantt', component: GanttDemo },
+        { id: 'ganttfark', label: 'Dark Gantt', component: GanttDemoDark },
         { id: 'heatmap', label: 'Heatmap (Blue/Red)', component: HeatmapDemo },
         { id: 'heatmap2', label: 'Heatmap (Green/Yellow)', component: HeatmapDemo2 },
     ];
