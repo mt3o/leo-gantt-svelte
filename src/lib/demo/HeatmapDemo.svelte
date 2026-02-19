@@ -86,7 +86,7 @@
   function onWheel(e: WheelEvent) {
     const container = e.currentTarget as HTMLElement;
     const config = { viewStart, viewEnd};
-    const nextRange = handleWheelZoom(e, container, config, _theme);
+    const nextRange = handleWheelZoom(e, container, config, _theme, totalStart, totalEnd);
 
     if (nextRange) {
       viewStart = nextRange.start;

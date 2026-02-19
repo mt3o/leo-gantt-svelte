@@ -40,14 +40,17 @@
   />
 
   {#if width > 40}
-    <text
-      x={x + 6}
-      y={y + height / 2}
-      dominant-baseline="central"
-      fill={task?.textColor}
-      class="{!task?.textColor && _theme.colors.taskText} text-[11px] font-semibold pointer-events-none select-none"
-    >
-      {task.label}
-    </text>
+    <foreignObject
+      x={x} y={y}
+      width={width} height={height}
+      >
+      <div
+              xmlns="http://www.w3.org/1999/xhtml"
+              style:color={task?.textColor ?? _theme.colors.taskText}
+              class="{_theme.classes.taskTextFormatting}"
+      >
+              {task.label}
+      </div>
+    </foreignObject>
   {/if}
 </g>

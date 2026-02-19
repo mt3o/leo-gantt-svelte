@@ -1,3 +1,5 @@
+import {deepMerge} from "$lib/logic/utils";
+
 export interface GanttTheme {
   colors: {
     background: string;
@@ -30,38 +32,11 @@ export interface GanttTheme {
   };
   classes: {
     rowText: string;
+    taskTextFormatting: string;
+
   }
 }
 
-export const mergeGanttTheme = (a: Partial<GanttTheme>, b?: Partial<GanttTheme>, fallback?: GanttTheme): GanttTheme => {
-    if(!fallback)
-        fallback = GANTT_THEME;
-    if(!b)
-        b={};
-
-    return {
-        colors: {
-            ...fallback.colors,
-            ...b.colors,
-            ...a.colors,
-        },
-        styles: {
-            ...fallback.styles,
-            ...a.styles,
-            ...b.styles,
-        },
-        dimensions: {
-            ...fallback.dimensions,
-            ...b.dimensions,
-            ...a.dimensions,
-        },
-        classes: {
-            ...fallback.classes,
-            ...b.classes,
-            ...a.classes,
-        },
-    }
-}
 export const GANTT_THEME: GanttTheme = {
   colors: {
     background: 'bg-white',
@@ -94,15 +69,15 @@ export const GANTT_THEME: GanttTheme = {
   },
   classes: {
     rowText: 'text-sm text-slate-700 truncate select-none',
+    taskTextFormatting: 'gantt-task-text pbs-[6px] pt-[3px] text-[11px] font-semibold pointer-events-none select-none text-overflow-ellipsis overflow-hidden ',
   }
 };
 
-export const GANTT_THEME_DARK: GanttTheme = {
+export const GANTT_THEME_DARK: GanttTheme = deepMerge(GANTT_THEME,{
   colors: {
     background: 'bg-slate-900',
     rowBackground: 'bg-slate-800',
     taskDefault: '#60a5fa', // blue-400
-    taskText: 'text-white',
     gridLine: 'stroke-slate-700',
     dependencyLine: 'stroke-slate-600 opacity-60',
     dependencyLineHighlighted: 'stroke-blue-400 opacity-100',
@@ -115,42 +90,9 @@ export const GANTT_THEME_DARK: GanttTheme = {
     sidebarBackground: '#1e293b', // slate-800
     text: '#f1f5f9', // slate-100
     textLight: '#94a3b8', // slate-400
-  },
-  styles: {
-    taskRadius: '4px',
-  },
-  dimensions: {
-    sidebarWidth: 250,
-    rowHeight: 40,
-    taskHeight: 24,
-    navigatorHeight: 40,
-    containerWidth: 1200,
-    containerHeight: 600,
-  },
-  classes: {
-    rowText: 'text-sm text-slate-400 truncate select-none',
   }
-};
+});
 
 export const makeTheme: (input: Partial<GanttTheme>) => GanttTheme = (input) => {
-    return {
-        ...GANTT_THEME,
-        ...input,
-        colors:{
-            ...GANTT_THEME.colors,
-            ...input.colors
-        },
-        styles:{
-            ...GANTT_THEME.styles,
-            ...input.styles
-        },
-        dimensions:{
-            ...GANTT_THEME.dimensions,
-            ...input.dimensions
-        },
-        classes:{
-            ...GANTT_THEME.classes,
-            ...input.classes
-        },
-    }
+    return deepMerge(GANTT_THEME,input);
 }

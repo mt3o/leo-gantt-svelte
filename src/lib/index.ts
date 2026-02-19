@@ -5,7 +5,8 @@ import RowsContainer from '$lib/components/Grid/RowsContainer.svelte';
 import Header from '$lib/components/Grid/Header.svelte';
 import {flattenResources, getTaskProjectionMap} from '$lib/logic/tree-walker';
 import {handleWheelZoom} from '$lib/logic/navigation';
-import {mergeGanttTheme} from '$lib/gantt-theme'
+import {makeTheme} from "$lib/gantt-theme";
+import {deepMerge} from "$lib/logic/utils";
 
 import type {
     Task,
@@ -31,7 +32,7 @@ export {
     Navigator,
     GANTT_THEME, GANTT_THEME_DARK,
     flattenResources, getTaskProjectionMap, handleWheelZoom,
-    mergeGanttTheme
+    makeTheme,deepMerge
 }
 export type {
     FlattenedItem,
