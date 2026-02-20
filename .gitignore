@@ -1,7 +1,7 @@
 .idea
 node_modules
 dist/*
-
+dist-demo/*
 *storybook.log
 storybook-static
 /.svelte-kit/

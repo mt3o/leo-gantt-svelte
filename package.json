@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "vite dev",
     "build": "vite build && svelte-package",
+    "build-gh-pages": "vite build --outDir dist-demo && svelte-package",
     "preview": "vite preview",
     "package": "svelte-package",
     "check": "svelte-check --tsconfig ./tsconfig.json",
