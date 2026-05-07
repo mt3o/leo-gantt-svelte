@@ -4,6 +4,7 @@ export interface GanttTheme {
   colors: {
     background: string;
     rowBackground: string;
+    sidebarContainerBorder: string;
     taskDefault: string;
     taskText: string;
     gridLine: string;
@@ -40,6 +41,7 @@ export interface GanttTheme {
 export const GANTT_THEME: GanttTheme = {
   colors: {
     background: 'bg-white',
+    sidebarContainerBorder: 'border-slate-200',
     rowBackground: 'bg-white',
     taskDefault: '#3b82f6', // blue-500
     taskText: 'text-white',
